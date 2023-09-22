@@ -1,0 +1,441 @@
+---
+title: "Goal2VariablesOrganization"
+author: "Jiayi Zhou"
+date: "2022-12-09"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#read in y1 response variable file for later use
+holder<- read.csv("holder.csv")
+#remove extrac column
+holder<-holder[,-1]
+```
+
+```{r}
+#read in y2 response variable file for later use
+holder2<- read.csv("holder2.csv")
+#remove extrac column
+holder2<-holder2[,-1]
+```
+
+this and following code work for crime rate variables
+```{r}
+#read in data for year 10, fill in missing space, and extract year 10 data
+X10 <- read_excel("10.xlsx")
+n <- nrow(X10)
+a = 2
+for( i in 1:(n/2)){
+county <- X10$County[a]
+X10$County[a-1] <- county
+a = a + 2
+}
+n10 =subset(X10, Year =="2010")
+```
+
+```{r}
+#read in data for year 11, fill in missing space, and extract year 11 data
+X11 <- read_excel("11.xlsx")
+n <- nrow(X11)
+a = 2
+for( i in 1:(n/2)){
+county <- X11$County[a]
+X11$County[a-1] <- county
+a = a + 2
+}
+n11 =subset(X11, Year =="2011")
+```
+
+```{r}
+#read in data for year 12, fill in missing space, and extract year 12 data
+X12 <- read_excel("12.xlsx")
+n <- nrow(X12)
+a = 2
+for( i in 1:(n/2)){
+county <- X12$County[a]
+X12$County[a-1] <- county
+a = a + 2
+}
+n12 =subset(X12, Year =="2012")
+```
+
+```{r}
+#read in data for year 13, fill in missing space, and extract year 13 data
+X13 <- read_excel("13.xlsx")
+n <- nrow(X13)
+a = 2
+for( i in 1:(n/2)){
+county <- X13$County[a]
+X13$County[a-1] <- county
+a = a + 2
+}
+n13 =subset(X13, Year =="2013")
+```
+
+```{r}
+#read in data for year 14, fill in missing space, and extract year 14 data
+X14 <- read_excel("14.xlsx")
+n <- nrow(X14)
+a = 2
+for( i in 1:(n/2)){
+county <- X14$County[a]
+X14$County[a-1] <- county
+a = a + 2
+}
+n14 =subset(X14, Year =="2014")
+```
+
+```{r}
+#read in data for year 15, fill in missing space, and extract year 15 data
+X15 <- read_excel("15.xlsx")
+n <- nrow(X15)
+a = 2
+for( i in 1:(n/2)){
+county <- X15$County[a]
+X15$County[a-1] <- county
+a = a + 2
+}
+n15 =subset(X15, Year =="2015")
+```
+
+```{r}
+#read in data for year 16, fill in missing space, and extract year 16 data
+X16 <- read_excel("16.xlsx")
+n <- nrow(X16)
+a = 2
+for( i in 1:(n/2)){
+county <- X16$County[a]
+X16$County[a-1] <- county
+a = a + 2
+}
+n16 =subset(X16, Year =="2016")
+```
+
+```{r}
+#read in data for year 17, fill in missing space, and extract year 17 data
+X17 <- read_excel("17.xlsx")
+n <- nrow(X17)
+a = 2
+for( i in 1:(n/2)){
+county <- X17$County[a]
+X17$County[a-1] <- county
+a = a + 2
+}
+n17 =subset(X17, Year =="2017")
+```
+
+```{r}
+#read in data for year 18, fill in missing space, and extract year 18 data
+X18 <- read_excel("18.xlsx")
+n <- nrow(X18)
+a = 2
+for( i in 1:(n/2)){
+county <- X18$County[a]
+X18$County[a-1] <- county
+a = a + 2
+}
+n18 =subset(X18, Year =="2018")
+```
+
+```{r}
+#read in data for year 19, fill in missing space, and extract year 19 data
+X19 <- read_excel("19.xlsx")
+n <- nrow(X19)
+a = 2
+for( i in 1:(n/2)){
+county <- X19$County[a]
+X19$County[a-1] <- county
+a = a + 2
+}
+n19 =subset(X19, Year =="2019")
+```
+
+```{r}
+#read in data for year 20, fill in missing space, and extract year 20, 21 data
+X20 <- read_excel("20.xlsx")
+n <- nrow(X20)
+a = 2
+for( i in 1:(n/2)){
+county <- X20$County[a]
+X20$County[a-1] <- county
+a = a + 2
+}
+n20 =subset(X20, Year =="2020")
+n21 =subset(X20, Year =="2021")
+```
+
+Combine all the data set by years, remove missing value, and rename variables
+```{r}
+#combine data
+crimedata <- rbind(n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20,n21)
+#delete all the NAs in crimedata
+crimedata <- subset(crimedata, crimedata$`Index Crime Rate` != '-')
+crimedata<- crimedata[-c(3)]
+crimedata<-crimedata[crimedata$Year!=2018,]#We are required to ignore the year 2018-2019 
+#rename the variables
+crimedata$County<- gsub('[0-9.]', '', crimedata$County)
+crimedata$County<- gsub(',', '', crimedata$County)
+```
+
+modify holder file
+```{r}
+##Change holder's year into normal year, so we can merge holder with x later; holder is our y1 
+holder$Group.1 <- ifelse(holder$Group.1 == 1011 , 2010, holder$Group.1)
+holder$Group.1 <- ifelse(holder$Group.1 == 1112 , 2011, holder$Group.1)
+holder$Group.1 <- ifelse(holder$Group.1 == 1213 , 2012, holder$Group.1)
+holder$Group.1 <- ifelse(holder$Group.1 == 1314 , 2013, holder$Group.1)
+holder$Group.1 <- ifelse(holder$Group.1 == 1415 , 2014, holder$Group.1)
+holder$Group.1 <- ifelse(holder$Group.1 == 1516 , 2015, holder$Group.1)
+holder$Group.1 <- ifelse(holder$Group.1 == 1617 , 2016, holder$Group.1)
+holder$Group.1 <- ifelse(holder$Group.1 == 1718 , 2017, holder$Group.1)
+holder$Group.1 <- ifelse(holder$Group.1 == 1920 , 2019, holder$Group.1)
+holder$Group.1 <- ifelse(holder$Group.1 == 2021 , 2020, holder$Group.1)
+holder$Group.1 <- ifelse(holder$Group.1 == 2122 , 2021, holder$Group.1)
+colnames(holder)<-c("Year","County","y1")
+```
+
+modify holder2 file
+```{r}
+###Change holder2's year into normal year, so we can merge holder2 with x later; holder2 is our y2
+holder2$Group.1 <- ifelse(holder2$Group.1 == 1011 , 2010, holder2$Group.1)
+holder2$Group.1 <- ifelse(holder2$Group.1 == 1112 , 2011, holder2$Group.1)
+holder2$Group.1 <- ifelse(holder2$Group.1 == 1213 , 2012, holder2$Group.1)
+holder2$Group.1 <- ifelse(holder2$Group.1 == 1314 , 2013, holder2$Group.1)
+holder2$Group.1 <- ifelse(holder2$Group.1 == 1415 , 2014, holder2$Group.1)
+holder2$Group.1 <- ifelse(holder2$Group.1 == 1516 , 2015, holder2$Group.1)
+holder2$Group.1 <- ifelse(holder2$Group.1 == 1617 , 2016, holder2$Group.1)
+holder2$Group.1 <- ifelse(holder2$Group.1 == 1718 , 2017, holder2$Group.1)
+holder2$Group.1 <- ifelse(holder2$Group.1 == 1920 , 2019, holder2$Group.1)
+holder2$Group.1 <- ifelse(holder2$Group.1 == 2021 , 2020, holder2$Group.1)
+holder2$Group.1 <- ifelse(holder2$Group.1 == 2122 , 2021, holder2$Group.1)
+colnames(holder2)<-c("Year","County","y2")
+```
+
+read in other explanatory variables
+```{r}
+#other explanatory variables by Xinyuan
+Explanatory1<-read_excel("Explanatory1.xlsx")
+```
+
+merge the crime data with other explantory variables
+```{r}
+Combine<-merge(crimedata,Explanatory1,by.x=c("Year","County"),by.y=c("Year","County"))
+```
+
+start handle Ethnic make up variables
+```{r}
+#read in census data
+census2010 <- read_excel("2010Census.xlsx")
+census2020 <- read_excel("2020Census.xlsx")
+labels2010 <- census2010$Label
+labels2020 <- census2020$Label
+census2010 <- census2010[,-1]
+census2020 <- census2020[,-1]
+```
+
+```{r}
+#select variables and add variable name
+census2010 <-census2010[c(1,2,6),]
+census2020 <-census2020[c(1,2,6),]
+rownames(census2010) <- labels2010[c(1,2,6)]
+rownames(census2020) <- labels2020[c(1,2,6)]
+```
+
+```{r}
+#transform dataset for 2010
+census2010 <- data.frame(census2010)
+census2010 <- t(census2010)
+census2010 <- data.frame(census2010)
+census2010$County <- rownames(census2010)
+rownames(census2010) <- 1:100
+colnames(census2010) <- c("Total", "HispanicLatino" , "Black", "County")
+```
+
+```{r}
+#modify county name
+for( i in 1:100){
+ census2010$County[i] <- unlist(strsplit( gsub('[[:punct:] ]+',',',census2010$County[i]), split = ","))[1]
+}
+```
+
+```{r}
+#transform dataset for 2020
+census2020 <- data.frame(census2020)
+census2020 <- t(census2020)
+census2020 <- data.frame(census2020)
+census2020$County <- rownames(census2020)
+rownames(census2020) <- 1:100
+colnames(census2020) <- c("Total", "HispanicLatino" , "Black", "County")
+```
+
+```{r}
+#modify county name
+for( i in 1:100){
+ census2020$County[i] <- unlist(strsplit( gsub('[[:punct:] ]+',',',census2020$County[i]), split = ","))[1]
+}
+```
+
+```{r}
+#modify total, hispanic, black value for 2010
+for( i in 1:100){
+ census2010$Total[i] <- gsub('[[:punct:] ]+','',census2010$Total[i])
+ census2010$HispanicLatino[i] <- gsub('[[:punct:] ]+','',census2010$HispanicLatino[i])
+ census2010$Black[i] <- gsub('[[:punct:] ]+','',census2010$Black[i])
+}
+```
+
+```{r}
+#modify total, hispanic, black value for 2020
+for( i in 1:100){
+ census2020$Total[i] <- gsub('[[:punct:] ]+','',census2020$Total[i])
+ census2020$HispanicLatino[i] <- gsub('[[:punct:] ]+','',census2020$HispanicLatino[i])
+  census2020$Black[i] <- gsub('[[:punct:] ]+','',census2020$Black[i])
+}
+```
+
+```{r}
+#change type to numeric
+census2010$Total <-as.numeric(census2010$Total)
+census2020$Total <-as.numeric(census2020$Total)
+census2010$HispanicLatino <-as.numeric(census2010$HispanicLatino)
+census2020$HispanicLatino <-as.numeric(census2020$HispanicLatino)
+census2010$Black <-as.numeric(census2010$Black)
+census2020$Black <-as.numeric(census2020$Black)
+```
+
+```{r}
+#calculated the difference
+differencesTotal <- census2020$Total - census2010$Total
+differencesHispanicLatino <- census2020$HispanicLatino - census2010$HispanicLatino
+differencesBlack<- census2020$Black - census2010$Black
+```
+
+```{r}
+#calculate the change
+changeInTotal <- differencesTotal/10
+changeInHispanicLatino<- differencesHispanicLatino/10
+changeInBlack<- differencesBlack/10
+```
+
+```{r}
+#add year o 2010 nd 2020
+census2010$Year <- 2010
+census2020$Year <- 2020
+```
+
+```{r}
+#create static estiamtion for missing years
+for( i in 1:9){
+  Total = census2010$Total+i*changeInTotal
+  HispanicLatino=census2010$HispanicLatino+i*changeInHispanicLatino
+  Black=census2010$Black+i*changeInBlack
+  assign(paste0("census201", i), data.frame(do.call(rbind, Map(data.frame, Total=Total, HispanicLatino=HispanicLatino, Black=Black, County=census2010$County, Year=(paste0("201", i))))))
+}
+```
+
+```{r}
+#bind all the census data
+censusdata <- rbind(census2010,census2011,census2012,census2013,census2014,census2015,census2016,census2017,census2018,census2019,census2020)
+```
+
+```{r}
+#newly merged data
+Combine1<-merge(censusdata,Combine,by.x=c("Year","County"),by.y=c("Year","County"))
+```
+
+```{r}
+#change county name to upper cases
+Combine1$County = toupper(Combine1$County)
+```
+
+load in Political Views Data
+```{r}
+PoliticalViewsNCData <- read_excel("/deac/sta/classes/sta381-fa-2022/Team02/YifanAttempt/North Carolina Election Data.xlsx")
+PoliticalViewsNCData2008 <- read_excel("/deac/sta/classes/sta381-fa-2022/Team02/YifanAttempt/PoliticalViewsNCData2008.xlsx")
+PoliticalViewsNCData2012 <- read_excel("/deac/sta/classes/sta381-fa-2022/Team02/YifanAttempt/PoliticalViewsNCData2012.xlsx")
+PoliticalViewsNCData2016 <- read_excel("/deac/sta/classes/sta381-fa-2022/Team02/YifanAttempt/PoliticalViewsNCData2016.xlsx")
+PoliticalViewsNCData2020 <- read_excel("/deac/sta/classes/sta381-fa-2022/Team02/YifanAttempt/PoliticalViewsNCData2020.xlsx")
+```
+
+load in combine1 data, all explantory variable added
+```{r}
+Combine1<-read_excel("/deac/sta/classes/sta381-fa-2022/Team02/YifanAttempt/Combine_1_Updated.xlsx")
+```
+
+add y1
+```{r}
+#merge combine1--explanatory variable with Y1
+Combine2<-merge(holder,Combine1,by.x=c("Year","County"),by.y=c("Year","County"))
+```
+
+add y2
+```{r}
+#Merge explanatory variable with Y2
+Combine3<-merge(holder2,Combine1,by.x=c("Year","County"),by.y=c("Year","County"))
+```
+
+```{r}
+#modify column names
+colnames(Combine2) <- gsub(" ", "_", colnames(Combine2))
+colnames(Combine3) <- gsub(" ", "_", colnames(Combine3))
+Combine2$Property_Crime_Rate<- gsub(',', '', Combine2$Property_Crime_Rate)
+Combine3$Property_Crime_Rate<- gsub(',', '', Combine3$Property_Crime_Rate)
+```
+
+```{r}
+#change type of variables
+Combine2$Violent_Crime_Rate <- as.numeric(Combine2$Violent_Crime_Rate)
+Combine2$Property_Crime_Rate <- as.numeric(Combine2$Property_Crime_Rate)
+Combine2$Defense_Counsel_Types <- as.numeric(Combine2$Defense_Counsel_Types)
+
+
+Combine3$Violent_Crime_Rate <- as.numeric(Combine3$Violent_Crime_Rate)
+Combine3$Property_Crime_Rate <- as.numeric(Combine3$Property_Crime_Rate)
+Combine3$Defense_Counsel_Types <- as.numeric(Combine3$Defense_Counsel_Types)
+```
+
+```{r}
+#Fix the missing values
+Combine2[516, 8]<-3609.7
+Combine2[610, 8]<-2855.2
+
+Combine3[516, 8]<-3609.7
+Combine3[610, 8]<-2855.2
+```
+
+```{r}
+#change type of variables
+Combine2$Judical_District_C <-as.factor(Combine2$Judical_District_C)
+Combine2$Prosecutorial_District_B<-as.factor(Combine2$Prosecutorial_District_B)
+```
+
+```{r}
+#discover correlation between variables
+library(corrplot)
+corrplot(cor(Combine2[c(1:909),c(4:10,13:15)]), type = "upper")
+```
+
+```{r}
+#modify variables to change scale and break correlation
+Combine2$HispanicLatino=Combine2$HispanicLatino/Combine2$Total
+Combine2$Black=Combine2$Black/Combine2$Total
+Combine2$Total=Combine2$Total/1000
+Combine2$Volume_of_Cases_in_County=Combine2$Volume_of_Cases_in_County/Combine2$Total
+```
+
+```{r}
+#modify variables to change scale and break correlation
+Combine3$HispanicLatino=Combine3$HispanicLatino/Combine3$Total
+Combine3$Black=Combine3$Black/Combine3$Total
+Combine3$Total=Combine3$Total/1000
+Combine3$Volume_of_Cases_in_County=Combine3$Volume_of_Cases_in_County/Combine3$Total
+```
+
+```{r}
+write.csv(Combine2, file = "Combine2.csv")
+write.csv(Combine3, file = "Combine3.csv")
+```

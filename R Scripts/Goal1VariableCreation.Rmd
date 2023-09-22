@@ -1,0 +1,129 @@
+---
+title: "Goal1VariableCreation"
+author: "Jiayi Zhou"
+date: "2022-12-09"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+We load in the library for the code
+```{r}
+library(readxl)
+library(tidyverse)
+```
+Then we read in all the data from felony reports.
+```{r}
+fy10_11<- read_excel("fy10-11.xls")
+fy11_12 <- read_excel("fy11-12.xls")
+fy12_13 <- read_excel("fy12-13.xls")
+fy13_14 <- read_excel("fy13_14.xlsx")
+fy14_15 <- read_excel("fy14-15.xlsx")
+fy15_16 <- read_excel("fy15-16.xlsx")
+fy16_17 <- read_excel("fy16-17.xlsx")
+fy17_18 <- read_excel("fy17-18.xlsx")
+fy19_20 <- read_excel("fy19-20.xlsx")
+fy20_21 <- read_excel("fy20-21.xlsx")
+fy21_22 <- read_excel("fy21-22.xlsx")
+```
+
+Create a list for all the data load in for future use in for loop
+```{r}
+list <-c("fy10_11","fy11_12","fy12_13","fy13_14","fy14_15","fy15_16","fy16_17","fy17_18","fy19_20","fy20_21","fy21_22")
+```
+
+Extracted the variables from each dataset based on customer needs, create new dataframe and remove old ones.
+```{r}
+for(i in list){
+  df <- get(i)
+  df <- df %>% dplyr:: select("DC", "DA", "SC", "AREA", "FMT", "CHARGE", "CHARGE_TEXT", "CRS_CASES_DISPOSED", "CRS_CASES_JURY_TRIAL_GUILTY_VERDICT", "CRS_CASES_JURY_TRIAL_NOT_GUILTY_VERDICT", "CRS_CASES_JURY_TRIAL_GUILTY_PLEA_BEFORE_VERDICT", "CRS_CASES_DISMISSAL_AFTER_DEFERRED_PROSECUTION", "CRS_CASES_DISMISSAL_WITH_LEAVE", "CRS_CASES_GUILTY_PLEA_NO_CONTEST_TO_LESS", "CRS_CASES_GUILTY_PLEA_NO_CONTEST")
+  assign(as.character(i), df, envir= .GlobalEnv)
+}
+remove(df)
+```
+
+Select the felony cases only and add add year variable to each data frame.
+```{r}
+fy10_11 <- subset(fy10_11, FMT=="F")
+fy10_11$Year <- 1011
+fy11_12 <- subset(fy11_12, FMT=="F")
+fy11_12$Year <- 1112
+fy12_13 <- subset(fy12_13, FMT=="F")
+fy12_13$Year <- 1213
+fy13_14 <- subset(fy13_14, FMT=="F")
+fy13_14$Year <- 1314
+fy14_15 <- subset(fy14_15, FMT=="F")
+fy14_15$Year <- 1415
+fy15_16 <- subset(fy15_16, FMT=="F")
+fy15_16$Year <- 1516
+fy16_17 <- subset(fy16_17, FMT=="F")
+fy16_17$Year <- 1617
+fy17_18 <- subset(fy17_18, FMT=="F")
+fy17_18$Year <- 1718
+fy19_20 <- subset(fy19_20, FMT=="F")
+fy19_20$Year <- 1920
+fy20_21 <- subset(fy20_21, FMT=="F")
+fy20_21$Year <- 2021
+fy21_22 <- subset(fy21_22, FMT=="F")
+fy21_22$Year <- 2122
+```
+
+Combine all the data
+```{r}
+newdata <- rbind(fy10_11,fy11_12,fy12_13,fy13_14,fy14_15,fy15_16,fy16_17,fy17_18,fy19_20,fy20_21,fy21_22)
+```
+
+Remove all the statewide data as we only focus on county
+```{r}
+#remove state data
+nostate =subset(newdata, AREA !="STATEWIDE")
+```
+
+Create y1-Trial Conviction Rate and y2-Trial Disposition Rate variables
+```{r}
+nostate$numerator <- nostate$CRS_CASES_JURY_TRIAL_GUILTY_VERDICT + nostate$CRS_CASES_JURY_TRIAL_GUILTY_PLEA_BEFORE_VERDICT
+
+nostate$denominator <- nostate$CRS_CASES_JURY_TRIAL_GUILTY_VERDICT + nostate$CRS_CASES_JURY_TRIAL_GUILTY_PLEA_BEFORE_VERDICT + nostate$CRS_CASES_GUILTY_PLEA_NO_CONTEST_TO_LESS + nostate$CRS_CASES_GUILTY_PLEA_NO_CONTEST
+
+#Trial Conviction Rate
+nostate$y1 <- nostate$numerator/nostate$denominator
+
+nostate$numerator2 <- nostate$CRS_CASES_JURY_TRIAL_GUILTY_VERDICT + nostate$CRS_CASES_JURY_TRIAL_GUILTY_PLEA_BEFORE_VERDICT + nostate$CRS_CASES_JURY_TRIAL_NOT_GUILTY_VERDICT
+
+nostate$denominator2 <- nostate$CRS_CASES_JURY_TRIAL_GUILTY_VERDICT + nostate$CRS_CASES_JURY_TRIAL_GUILTY_PLEA_BEFORE_VERDICT + nostate$CRS_CASES_GUILTY_PLEA_NO_CONTEST_TO_LESS + nostate$CRS_CASES_GUILTY_PLEA_NO_CONTEST + nostate$CRS_CASES_DISMISSAL_AFTER_DEFERRED_PROSECUTION + nostate$CRS_CASES_DISMISSAL_WITH_LEAVE
+
+#Trial Disposition Rate
+nostate$y2 <- nostate$numerator2/nostate$denominator2
+```
+
+remove all the na from the dataset and calculate mean for both y1 and y2
+```{r}
+#delete all the NAs in y1
+nostateNoNA <- subset(nostate, is.na(y1)==FALSE)
+#calculate the mean for y1 by county and year. i.e. the mean of y1 for the same county in the same year
+holder <- aggregate(nostateNoNA$y1, list(nostateNoNA$Year, nostateNoNA$AREA), FUN= mean)
+#do the same for y2, and store all the data in holder2
+holder2 <- aggregate(nostateNoNA$y2, list(nostateNoNA$Year, nostateNoNA$AREA), FUN= mean)
+```
+
+write y1 in holder and y2 in holder2 into csv.
+```{r}
+#output holder and holder2 to csv so that further actions can be done through excel. 
+write.csv(holder, file = "holder.csv")
+write.csv(holder2, file = "holder2.csv")
+```
+
+save y1, y2, and nostate into csv.
+```{r}
+y1 <- nostate$y1
+y2 <- nostate$y2
+write.csv(nostate, file="nostate.csv")
+write.csv(y1, file="y1.csv")
+write.csv(y2, file="y2.csv")
+```
+
+```{r}
+write.csv(nostateNoNA, file="nostateNoNA.csv")
+```

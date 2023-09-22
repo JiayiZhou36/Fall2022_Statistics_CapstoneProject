@@ -1,0 +1,100 @@
+---
+title: "Goal2DecisionTree"
+author: "Jiayi Zhou"
+date: "2022-12-09"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#load in library for decision tree
+library(rpart)
+library(rpart.plot)
+```
+
+```{r}
+#read in y1 response variable and explantory variables file for later use
+Combine2 <-read.csv("Combine2.csv")
+#remove extrac column
+Combine2<-Combine2[,-1]
+```
+
+```{r}
+#read in y2 response variable and explantory variables file for later use
+Combine3 <-read.csv("Combine3.csv")
+#remove extrac column
+Combine3<-Combine3[,-1]
+```
+
+```{r}
+#change name of variables
+Y1 <- y1
+rm(y1)
+Y2 <- y2
+rm(y2)
+```
+
+```{r}
+#build the tree for explantory variable 1
+DataForTree1 <- model.matrix(y1 ~ as.factor(Year) + Total + HispanicLatino + Black + Violent_Crime_Rate + Property_Crime_Rate + Acquittal_Rates + Dismissal_Rates + County+Judical_District_C+Volume_of_Cases_in_County+Defense_Counsel_Types+Percent_Republican, data = Combine2)
+```
+
+```{r}
+#draw the tree for explantory variable 1
+#maximize the R^2 and keep the tree readble
+DataForTree1 <- cbind("y1" = Combine2$y1, DataForTree1)
+tree1 <- rpart( y1 ~ ., data = data.frame(DataForTree1)[,-2], cp = 0.005)
+#cp can change to smaller value to improve r^2, but tree will get more complicated
+prp(tree1,varlen=0, Margin=0, cex = .4)
+```
+
+```{r}
+#calculate the R^2 for the tree
+DataForTree1 <- data.frame(DataForTree1)
+# R^2 = 1 - RSS/TSS
+TSS <- sum( (DataForTree1$y1 - mean(DataForTree1$y1))^2)
+preds <- predict(tree1)
+RSS <- sum( (DataForTree1$y1 - preds)^2)
+1- RSS/TSS
+```
+
+```{r}
+#see error
+printcp(tree1)
+```
+
+```{r}
+#build tree for explantory variable 2
+DataForTree2 <- model.matrix(y2 ~ as.factor(Year) + Total + HispanicLatino + Black + Violent_Crime_Rate + Property_Crime_Rate + Acquittal_Rates + Dismissal_Rates + County+Judical_District_C+Volume_of_Cases_in_County+Defense_Counsel_Types+Percent_Republican, data = Combine3)
+DataForTree2 <- cbind("y2" = Combine3$y2, DataForTree2)
+```
+
+```{r}
+#change matrix to dataframe
+DataForTree2 <-data.frame(DataForTree2)
+```
+
+```{r}
+#draw the tree
+#maximize R^2 and keep the tree readable
+tree2 <- rpart( y2 ~ ., data = DataForTree2[,-2], cp = 0.005)
+#cp can change to smaller value to improve r^2, but tree will get more complicated
+prp(tree2,varlen=0, Margin=0, cex = .5)
+```
+
+```{r}
+#calcuate R^2
+# R^2 = 1 - RSS/TSS
+TSS2 <- sum((DataForTree2$y2 - mean(DataForTree2$y2))^2)
+preds2 <- predict(tree2)
+RSS2 <- sum( (DataForTree2$y2 - preds2)^2)
+1- RSS2/TSS2
+```
+
+```{r}
+#see error
+printcp(tree2)
+```
